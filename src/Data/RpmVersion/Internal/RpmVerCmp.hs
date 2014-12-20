@@ -31,6 +31,9 @@ import qualified Data.Text as Strict.Text
 -- {{{ RPM Version Comparision ------------------------------------------------
 
 -- | Version comparision as understood by /RPM/ package manager.
+--
+-- Implementation is based on:
+-- <http://blog.jasonantman.com/2014/07/how-yum-and-rpm-compare-versions/>
 rpmVerCmp :: Strict.Text -> Strict.Text -> Ordering
 rpmVerCmp = compareVersionsWith rpmBreak
 
