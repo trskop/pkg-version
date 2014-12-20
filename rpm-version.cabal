@@ -1,0 +1,38 @@
+name:                 rpm-version
+version:              0.1.0.0
+synopsis:             Data type for versions of RPM packages
+-- description:
+homepage:             https://github.com/trskop/rpm-version
+license:              BSD3
+license-file:         LICENSE
+author:               Peter Trško
+maintainer:           peter.trsko@gmail.com
+-- copyright:
+category:             Data
+build-type:           Simple
+cabal-version:        >=1.10
+
+extra-source-files:
+    ChangeLog.md
+  , README.md
+
+library
+  hs-source-dirs:       src
+  default-language:     Haskell2010
+
+  exposed-modules:
+      Data.RpmVersion
+    , Data.RpmVersion.Internal.RpmVersion
+    , Data.RpmVersion.Internal.RpmVerCmp
+
+  other-extensions:
+      DeriveDataTypeable
+    , DeriveGeneric
+    , NoImplicitPrelude
+
+  build-depends:
+      base >=4.7 && <4.8
+    , text >=1.1 && <1.3
+    , data-default-class ==0.0.*
+
+  ghc-options:          -Wall
