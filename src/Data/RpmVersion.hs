@@ -1,15 +1,13 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:       $HEADER$
 -- Description:  \<Short text displayed on contents page.\>
 -- Copyright:    (c) 2014 Peter Trsko
--- License:      All rights reserved. | BSD3
+-- License:      BSD3
 --
 -- Maintainer:   peter.trsko@gmail.com
--- Stability:    unstable | experimental | provisional | stable | frozen
--- Portability:  portable | non-portable (<reason>)
+-- Stability:    experimental
+-- Portability:  NoImplicitPrelude
 --
 -- \<Module description starting at first column.\>
 module Data.RpmVersion
