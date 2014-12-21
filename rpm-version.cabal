@@ -1,13 +1,31 @@
 name:                 rpm-version
 version:              0.1.0.0
-synopsis:             Data type for versions of RPM packages
--- description:
+synopsis:             Data type for versions used by RPM packages
+description:
+  Data type for version strings used by RPM package manager for packages.
+  .
+  Naming convention used by RPM package is sometimes refered to as NEVRA which
+  looks like:
+  .
+  @
+  name-epoch:version-release.architecture
+  @
+  .
+  Portion that contains only version information is sometimes called EVR:
+  .
+  @
+  epoch:version-release
+  @
+  .
+  This library provides @RpmVersion@ data type for EVR and correct @Eq@ and
+  @Ord@ instances.
+
 homepage:             https://github.com/trskop/rpm-version
 license:              BSD3
 license-file:         LICENSE
 author:               Peter Trško
 maintainer:           peter.trsko@gmail.com
--- copyright:
+copyright:            Copyright (c) 2014, Peter Trško
 category:             Data
 build-type:           Simple
 cabal-version:        >=1.10
