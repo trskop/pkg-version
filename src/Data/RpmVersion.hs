@@ -25,6 +25,7 @@ module Data.RpmVersion
 
     -- * Serialization
     , toStrictText
+    , toString
     )
   where
 
@@ -42,13 +43,14 @@ import Data.RpmVersion.Internal.RpmVersion
     , rpmRelease
     , rpmVersion
     , toStrictText
+    , toString
     )
 
 
 -- | Convert standard Haskell 'Version' in to 'RpmVersion'.
 --
 -- >>> fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
--- "0.1.2-alpha0-i386"
+-- 0.1.2-alpha0-i386
 -- >>> _rpmEpoch . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
 -- 0
 -- >>> _rpmVersion . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]

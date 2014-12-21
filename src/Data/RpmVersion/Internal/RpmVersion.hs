@@ -24,6 +24,7 @@ module Data.RpmVersion.Internal.RpmVersion
 
     -- * Serialization
     , toStrictText
+    , toString
 
     -- * Utility functions
     , compareRpmVersion
@@ -37,13 +38,14 @@ import Data.Function ((.), flip)
 import Data.Functor (Functor(fmap))
 import Data.Monoid ((<>))
 import Data.Ord (Ord(compare), Ordering(EQ))
+import Data.String (String)
 import Data.Typeable (Typeable)
 import Data.Word (Word32)
 import GHC.Generics (Generic)
-import Text.Show (Show(show, showsPrec))
+import Text.Show (Show(show, showsPrec), showString)
 
 import Data.Text as Strict (Text)
-import Data.Text as Strict.Text (empty, null, pack, singleton)
+import Data.Text as Strict.Text (empty, null, pack, singleton, unpack)
 
 import Data.Default.Class (Default(def))
 
@@ -75,8 +77,12 @@ toStrictText (RpmVersion e version r) = epoch <> version <> release
       | Strict.Text.null r = Strict.Text.empty
       | otherwise          = dash <> r
 
+-- | Serialize 'RpmVersion' in to 'String'. Internally it uses 'toStrictText'.
+toString :: RpmVersion -> String
+toString = Strict.Text.unpack . toStrictText
+
 instance Show RpmVersion where
-    showsPrec i = showsPrec i . toStrictText
+    showsPrec _ = showString . toString
 
 -- | Compare two 'RpmVersion' values using standard 'compare' for 'rpmEpoch',
 -- and 'rpmVerCmp' for 'rpmVersion' and 'rpmRelease'.
