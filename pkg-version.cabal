@@ -25,6 +25,7 @@ library
 
   exposed-modules:
       Data.PkgVersion
+    , Data.PkgVersion.Class
     , Data.PkgVersion.Internal.PkgVersion
     , Data.PkgVersion.Internal.RpmVerCmp
     , Data.PkgVersion.Internal.RpmVersion

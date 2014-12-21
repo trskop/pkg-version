@@ -18,14 +18,7 @@ module Data.PkgVersion
     -- * Smart Constructors
     , fromVersion
 
-    -- * Lenses
-    , rpmEpoch
-    , rpmVersion
-    , rpmRelease
-
-    -- * Serialization
-    , toStrictText
-    , toString
+    , module Data.PkgVersion.Class
     )
   where
 
@@ -37,15 +30,9 @@ import qualified Data.Text as Strict.Text (pack)
 
 import Data.Default.Class (Default(def))
 
+import Data.PkgVersion.Class
 import Data.PkgVersion.Internal.PkgVersion (PkgVersion(_pkgVersion))
-import Data.PkgVersion.Internal.RpmVersion
-    ( RpmVersion
-    , rpmEpoch
-    , rpmRelease
-    , rpmVersion
-    , toStrictText
-    , toString
-    )
+import Data.PkgVersion.Internal.RpmVersion (RpmVersion)
 
 
 -- | Convert simple version number in o PkgVersion.
