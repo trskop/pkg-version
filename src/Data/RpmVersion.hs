@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:       $HEADER$
--- Description:  \<Short text displayed on contents page.\>
+-- Description:  Data type for versions as understood by RPM package manager
 -- Copyright:    (c) 2014 Peter Trsko
 -- License:      BSD3
 --
@@ -9,10 +9,22 @@
 -- Stability:    experimental
 -- Portability:  NoImplicitPrelude
 --
--- \<Module description starting at first column.\>
+-- Data type for versions as understood by RPM package manager.
 module Data.RpmVersion
-    ( RpmVersion
+    (
+    -- * RpmVersion Data Type
+      RpmVersion
+
+    -- * Smart Constructors
     , fromVersion
+
+    -- * Lenses
+    , rpmEpoch
+    , rpmVersion
+    , rpmRelease
+
+    -- * Serialization
+    , toStrictText
     )
   where
 
@@ -22,9 +34,25 @@ import Data.Version (Version(..), showVersion)
 
 import qualified Data.Text as Strict.Text (pack)
 
-import Data.RpmVersion.Internal.RpmVersion (RpmVersion(..))
+import Data.RpmVersion.Internal.RpmVersion
+    ( RpmVersion(..)
+    , rpmEpoch
+    , rpmRelease
+    , rpmVersion
+    , toStrictText
+    )
 
 
+-- | Convert standard Haskell 'Version' in to 'RpmVersion'.
+--
+-- >>> fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
+-- "0.1.2-alpha0-i386"
+-- >>> _rpmEpoch . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
+-- 0
+-- >>> _rpmVersion . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
+-- "0.1.2"
+-- >>> _rpmRelease . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
+-- "alpha0-i386"
 fromVersion :: Version -> RpmVersion
 fromVersion Version{versionBranch = b, versionTags = t} = RpmVersion
     { _rpmEpoch   = 0

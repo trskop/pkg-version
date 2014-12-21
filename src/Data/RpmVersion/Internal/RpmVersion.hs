@@ -22,6 +22,9 @@ module Data.RpmVersion.Internal.RpmVersion
     , rpmEpoch
     , rpmVersion
     , rpmRelease
+
+    -- * Utility functions
+    , compareRpmVersion
     )
   where
 
@@ -45,7 +48,9 @@ import Data.Default.Class (Default(def))
 import Data.RpmVersion.Internal.RpmVerCmp (rpmVerCmp)
 
 
--- | Rerpresents EVR portion of NEVRA naming convention used by RPM.
+-- | Rerpresents EVR portion of NEVRA
+-- (@name-epoch:version-release.architecture@) naming convention used by RPM
+-- package manager.
 data RpmVersion = RpmVersion
     { _rpmEpoch   :: !Word32
     , _rpmVersion :: !Strict.Text
@@ -53,6 +58,7 @@ data RpmVersion = RpmVersion
     }
   deriving (Data, Generic, Typeable)
 
+-- | Serialize 'RpmVersion' to strict 'Strict.Text'.
 toStrictText :: RpmVersion -> Strict.Text
 toStrictText (RpmVersion e version r) = epoch <> version <> release
   where
@@ -70,6 +76,8 @@ toStrictText (RpmVersion e version r) = epoch <> version <> release
 instance Show RpmVersion where
     showsPrec i = showsPrec i . toStrictText
 
+-- | Compare two 'RpmVersion' values using standard 'compare' for 'rpmEpoch',
+-- and 'rpmVerCmp' for 'rpmVersion' and 'rpmRelease'.
 compareRpmVersion :: RpmVersion -> RpmVersion -> Ordering
 compareRpmVersion (RpmVersion e1 v1 r1) (RpmVersion e2 v2 r2)
   | epochCmp   /= EQ = epochCmp
@@ -88,17 +96,42 @@ instance Ord RpmVersion where
 
 instance Default RpmVersion where
     def = RpmVersion
-        { _rpmEpoch = 0
+        { _rpmEpoch   = 0
         , _rpmVersion = Strict.Text.empty
         , _rpmRelease = Strict.Text.empty
         }
 
 -- {{{ Lenses -----------------------------------------------------------------
 
+-- | Flipped version of 'fmap'. Not exported.
 (<$$>) :: Functor f => f a -> (a -> b) -> f b
 (<$$>) = flip fmap
 {-# INLINE (<$$>) #-}
 
+-- | Epoch number is used to determine which version is greater when
+-- 'rpmVerCmp' algorithm would fail to do it correctly for 'rpmVersion'.
+--
+-- Here is a perfect summary:
+--
+-- \"RPM needs to be able to determine which version numbers are more recent
+-- than others, in order to perform its version comparisons. It's pretty simple
+-- to determine that version 1.5 is older than version 1.6. But what about 2.01
+-- and 2.1? Or 7.6a and 7.6? There's no way for RPM to keep up with all the
+-- different version-numbering schemes in use. But there is a solution: epoch
+-- numbers.
+--
+-- When RPM can't decipher a package's version number, it's time to pull out
+-- the Epoch tag. This tag is used to help RPM determine version number
+-- ordering. If a packet has an epoch number of 42, what does the 42 mean? Only
+-- that this version of the package is newer than the same package with an
+-- epoch number of 41, but older than the same package with an epoch number of
+-- 43. If you think of epoch numbers as being nothing more than very simple
+-- version numbers, you'll be on the mark. In other words, Epoch is the most
+-- significant component of a package's complete version identifier with
+-- regards to RPM's version comparison algorithm.\"
+--
+-- Source:
+-- <https://ask.fedoraproject.org/en/question/6987/whats-the-meaning-of-the-number-which-appears-sometimes-when-i-use-yum-to-install-a-fedora-package-before-a-colon-at-the-beginning-of-the-name-of-the/?answer=12058#post-id-12058>
 rpmEpoch
     :: Functor f
     => (Word32 -> f Word32)
@@ -106,6 +139,10 @@ rpmEpoch
 rpmEpoch f s@(RpmVersion{_rpmEpoch = a}) =
     f a <$$> \b -> s{_rpmEpoch = b}
 
+-- | Version number consisting of alpha-numeric characters separated by
+-- non-alpha-numeric characters, it can not contain @\'-\'@, because that is
+-- used as a delimiter between version number and release in NEVRA
+-- (@name-epoch:version-release.architecture@) naming convention..
 rpmVersion
     :: Functor f
     => (Strict.Text -> f Strict.Text)
@@ -113,6 +150,10 @@ rpmVersion
 rpmVersion f s@(RpmVersion{_rpmVersion = a}) =
     f a <$$> \b -> s{_rpmVersion = b}
 
+-- | Release number, similar restrictins as for 'rpmVersion' apply. Difference
+-- is that it may contain @\'-\'@ character, but not @\'.\'@, since that is
+-- used to delimit architecture portion of NEVRA
+-- (@name-epoch:version-release.architecture@) naming convention.
 rpmRelease
     :: Functor f
     => (Strict.Text -> f Strict.Text)

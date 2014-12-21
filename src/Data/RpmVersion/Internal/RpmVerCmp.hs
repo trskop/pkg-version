@@ -3,7 +3,7 @@
 -- Module:       $HEADER$
 -- Description:  RPM version comparision
 -- Copyright:    (c) 2014 Peter Trsko
--- License:      All rights reserved. | BSD3
+-- License:      BSD3
 --
 -- Maintainer:   peter.trsko@gmail.com
 -- Stability:    experimental
@@ -11,18 +11,34 @@
 --
 -- Version comparision based on RPM package manager.
 module Data.RpmVersion.Internal.RpmVerCmp
-    ( rpmVerCmp
+    (
+    -- * RPM Version Comparison
+      rpmVerCmp
+    , rpmBreak
+
+    -- * Pkg-config Version Comparison
     , pkgVerCmp
+    , pkgBreak
+
+    -- * Utility Functions
+    , compareVersionsWith
+    , breakWith
+    , spanFor
+
+    -- ** Character Predicates
+    , notAlphaNum
+    , isTilde
+    , notTilde
     )
   where
 
 import Control.Applicative (liftA2)
 import Data.Bool (Bool(False, True), (&&), not, otherwise)
 import Data.Char (Char, isAlpha, isAlphaNum, isDigit)
-import Data.Eq (Eq((==), (/=)))
+import Data.Eq (Eq((==)))
 import Data.Function ((.), ($), on)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Ord (Ord(compare), Ordering(EQ, GT, LT))
+import Data.Ord (Ord(compare), Ordering(EQ))
 
 import qualified Data.Text as Strict (Text)
 import qualified Data.Text as Strict.Text
@@ -37,7 +53,8 @@ import qualified Data.Text as Strict.Text
 rpmVerCmp :: Strict.Text -> Strict.Text -> Ordering
 rpmVerCmp = compareVersionsWith rpmBreak
 
--- | Break version in to components the way how /RPM/ understands them.
+-- | Break string in to a version component and the resto of a string. It does
+-- it in a way how /RPM/ package manager understands versions.
 rpmBreak
     :: Strict.Text
     -> ((Bool, Strict.Text), Strict.Text)
@@ -66,10 +83,14 @@ rpmBreak s
 -- {{{ Pkg-config Version Comparision -----------------------------------------
 
 -- | Version comparision as understood by /pkg-config/ tool.
+--
+-- Difference between 'rpmVerCmp' and 'pkgVerCmp' is that 'pkgVerCmp' doesn't
+-- understand magic @~@ character.
 pkgVerCmp :: Strict.Text -> Strict.Text -> Ordering
 pkgVerCmp = compareVersionsWith pkgBreak
 
--- | Break version in to components the way how /pkg-config/ understands them.
+-- | Break string in to a version component and the resto of a string. It does
+-- it in a way how /pkg-config/ understands versions.
 pkgBreak :: Strict.Text -> (Strict.Text, Strict.Text)
 pkgBreak s
   | Strict.Text.null s = (s, s)                         -- = ("", "")
@@ -83,11 +104,6 @@ pkgBreak s
 
 -- {{{ Generic Helper Functions -----------------------------------------------
 
-isTilde, notTilde, notAlphaNum :: Char -> Bool
-isTilde = (== '~')
-notTilde = not . isTilde
-notAlphaNum = not . isAlphaNum
-
 -- | Split version string in to fragments, using provided function, and and
 -- compare it piece by piece. See also 'breakWith' and 'compareFragments'.
 compareVersionsWith
@@ -99,17 +115,9 @@ compareVersionsWith
     -> Ordering
 compareVersionsWith someBreak v1 v2
   | v1 == v2  = EQ
-  | otherwise = (compareFragments `on` breakWith someBreak) v1 v2
-
--- | Compare version splitted in to corresponding components.
-compareFragments :: Ord a => [a] -> [a] -> Ordering
-compareFragments []       []       = EQ
-compareFragments _        []       = GT
-compareFragments []       _        = LT
-compareFragments (x : xs) (y : ys) =
-    if r /= EQ then r else compareFragments xs ys
-  where
-    r = x `compare` y
+  | otherwise = (compare `on` breakWith someBreak) v1 v2
+    -- Function compare specialized to "Ord a => [a] -> [a] -> Ordering" does
+    -- the right thing when comparing version string fragments.
 
 -- | Iterate provided break function until it returns empty reminder.
 breakWith
@@ -126,6 +134,29 @@ breakWith someBreak str
       where
         (frag, rest) = someBreak str
 
+-- | Variant of 'Strict.Text.span' that changes its mode of operation depending
+-- on the class of character passed to it as a first argument.
+--
+-- 1. If first argument is a character representing alphabet character (not
+--    symbol or digit), then this function does @'Strict.Text.span' 'isAlpha'@.
+-- 2. If first argument is a character representing digit, then this function
+--    does @'Strict.Text.span' 'isDigit'@ and it removes all leading zeros.
+-- 3. If first argument is neither alphabet character nor digit, then this
+--    function behaves equivalently to
+--    @'Strict.Text.span' ('Data.Bool.const' 'False')@
+--
+-- Examples:
+--
+-- >>> spanFor '0' "0123abc"
+-- ("123","abc")
+-- >>> spanFor 'a' "0123abc"
+-- ("","0123abc")
+-- >>> spanFor 'a' "abc0123"
+-- ("abc","0123")
+-- >>> spanFor '-' "abc0123"
+-- ("","0123abc")
+-- >>> spanFor '-' "0123abc"
+-- ("","abc0123")
 spanFor :: Char -> Strict.Text -> (Strict.Text, Strict.Text)
 spanFor c s
   | isAlpha c = Strict.Text.span isAlpha s
@@ -145,5 +176,17 @@ spanFor c s
 
     zero :: Strict.Text
     zero = Strict.Text.singleton '0'
+
+-- | @'isTilde' = ('==' \'~\')@
+isTilde :: Char -> Bool
+isTilde = (== '~')
+
+-- | @'notTilde' = 'not' '.' 'isTilde'@
+notTilde :: Char -> Bool
+notTilde = not . isTilde
+
+-- | @'notAlphaNum' = 'not' '.' 'isAlphaNum'@
+notAlphaNum :: Char -> Bool
+notAlphaNum = not . isAlphaNum
 
 -- }}} Generic Helper Functions -----------------------------------------------
