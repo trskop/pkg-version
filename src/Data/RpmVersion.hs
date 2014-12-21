@@ -34,6 +34,8 @@ import Data.Version (Version(..), showVersion)
 
 import qualified Data.Text as Strict.Text (pack)
 
+import Data.Default.Class (Default(def))
+
 import Data.RpmVersion.Internal.RpmVersion
     ( RpmVersion(..)
     , rpmEpoch
@@ -54,9 +56,8 @@ import Data.RpmVersion.Internal.RpmVersion
 -- >>> _rpmRelease . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
 -- "alpha0-i386"
 fromVersion :: Version -> RpmVersion
-fromVersion Version{versionBranch = b, versionTags = t} = RpmVersion
-    { _rpmEpoch   = 0
-    , _rpmVersion = Strict.Text.pack $ showVersion Version
+fromVersion Version{versionBranch = b, versionTags = t} = def
+    { _rpmVersion = Strict.Text.pack $ showVersion Version
         { versionBranch = b
         , versionTags   = []
         }
