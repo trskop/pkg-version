@@ -16,12 +16,14 @@ module Data.RpmVersion.Internal.RpmVersion
     (
     -- * RpmVersion
       RpmVersion(..)
-    , toStrictText
 
     -- * Lenses
     , rpmEpoch
     , rpmVersion
     , rpmRelease
+
+    -- * Serialization
+    , toStrictText
 
     -- * Utility functions
     , compareRpmVersion
@@ -48,7 +50,7 @@ import Data.Default.Class (Default(def))
 import Data.RpmVersion.Internal.RpmVerCmp (rpmVerCmp)
 
 
--- | Rerpresents EVR portion of NEVRA
+-- | Rerpresents EVR (@epoch:version-release@) portion of NEVRA
 -- (@name-epoch:version-release.architecture@) naming convention used by RPM
 -- package manager.
 data RpmVersion = RpmVersion
@@ -88,12 +90,25 @@ compareRpmVersion (RpmVersion e1 v1 r1) (RpmVersion e2 v2 r2)
     versionCmp = v1 `rpmVerCmp` v2
     releaseCmp = r1 `rpmVerCmp` r2
 
+-- | @
+-- r1 '==' r2 = 'compareRpmVersion' r1 r2 '==' 'EQ'
+-- @
 instance Eq RpmVersion where
     r1 == r2 = compareRpmVersion r1 r2 == EQ
 
+-- | @
+-- 'compare' = 'compareRpmVersion'
+-- @
 instance Ord RpmVersion where
     compare = compareRpmVersion
 
+-- | @
+-- 'def' = 'RpmVersion'
+--     { '_rpmEpoch'   = 0
+--     , '_rpmVersion' = \"\"
+--     , '_rpmRelease' = \"\"
+--     }
+-- @
 instance Default RpmVersion where
     def = RpmVersion
         { _rpmEpoch   = 0
@@ -108,8 +123,11 @@ instance Default RpmVersion where
 (<$$>) = flip fmap
 {-# INLINE (<$$>) #-}
 
--- | Epoch number is used to determine which version is greater when
--- 'rpmVerCmp' algorithm would fail to do it correctly for 'rpmVersion'.
+-- | Epoch number within @[0, 'Prelude.maxBound' :: 'Word32']@ interval and
+-- defaults to 0 if not present. It is used to determine which version is
+-- greater when 'rpmVerCmp' algorithm would otherwise fail to do it correctly.
+-- In example @2.01@ and @2.1@ are considered equal by 'rpmVerCmp', but may be
+-- entirely different for a certain versioning scheme.
 --
 -- Here is a perfect summary:
 --
