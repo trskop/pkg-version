@@ -53,7 +53,7 @@ import qualified Data.Text as Strict.Text
 rpmVerCmp :: Strict.Text -> Strict.Text -> Ordering
 rpmVerCmp = compareVersionsWith rpmBreak
 
--- | Break string in to a version component and the resto of a string. It does
+-- | Break string in to a version component and the rest of a string. It does
 -- it in a way how /RPM/ package manager understands versions.
 rpmBreak
     :: Strict.Text
@@ -61,6 +61,8 @@ rpmBreak
     -- ^ Returns tuple of version component and reminder. Version component is
     -- itself a tuple where first argument is boolean that is 'True' if version
     -- component hadn't started with character @\'~\'@ and 'False' otherwise.
+    -- This does preserve @\'~\'@ semantics in terms of standard 'Eq' instance
+    -- for tuples.
 rpmBreak s
   | Strict.Text.null s = ((True, s), s)                 -- = ((True, ""), "")
   | otherwise          = case Strict.Text.uncons s' of
