@@ -1,24 +1,9 @@
-name:                 rpm-version
+name:                 pkg-version
 version:              0.1.0.0
-synopsis:             Data type for versions used by RPM packages
+synopsis:             Data types for versions used by RPM and DPKG packages
 description:
-  Data type for version strings used by RPM package manager for packages.
-  .
-  Naming convention used by RPM package is sometimes refered to as NEVRA which
-  looks like:
-  .
-  @
-  name-epoch:version-release.architecture
-  @
-  .
-  Portion that contains only version information is sometimes called EVR:
-  .
-  @
-  epoch:version-release
-  @
-  .
-  This library provides @RpmVersion@ data type for EVR and correct @Eq@ and
-  @Ord@ instances.
+  Data types for version strings used by RPM and DPKG package manager for
+  packages.
 
 homepage:             https://github.com/trskop/rpm-version
 license:              BSD3
@@ -39,9 +24,10 @@ library
   default-language:     Haskell2010
 
   exposed-modules:
-      Data.RpmVersion
-    , Data.RpmVersion.Internal.RpmVersion
-    , Data.RpmVersion.Internal.RpmVerCmp
+      Data.PkgVersion
+    , Data.PkgVersion.Internal.PkgVersion
+    , Data.PkgVersion.Internal.RpmVerCmp
+    , Data.PkgVersion.Internal.RpmVersion
 
   other-extensions:
       DeriveDataTypeable

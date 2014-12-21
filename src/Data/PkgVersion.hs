@@ -10,7 +10,7 @@
 -- Portability:  NoImplicitPrelude
 --
 -- Data type for versions as understood by RPM package manager.
-module Data.RpmVersion
+module Data.PkgVersion
     (
     -- * RpmVersion Data Type
       RpmVersion
@@ -29,16 +29,17 @@ module Data.RpmVersion
     )
   where
 
-import Data.Function ((.), ($))
-import qualified Data.List as List (drop)
+import Data.Function (($))
+import Data.Int (Int)
 import Data.Version (Version(..), showVersion)
 
 import qualified Data.Text as Strict.Text (pack)
 
 import Data.Default.Class (Default(def))
 
-import Data.RpmVersion.Internal.RpmVersion
-    ( RpmVersion(..)
+import Data.PkgVersion.Internal.PkgVersion (PkgVersion(_pkgVersion))
+import Data.PkgVersion.Internal.RpmVersion
+    ( RpmVersion
     , rpmEpoch
     , rpmRelease
     , rpmVersion
@@ -47,24 +48,20 @@ import Data.RpmVersion.Internal.RpmVersion
     )
 
 
--- | Convert standard Haskell 'Version' in to 'RpmVersion'.
+-- | Convert simple version number in o PkgVersion.
 --
--- >>> fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
--- 0.1.2-alpha0-i386
--- >>> _rpmEpoch . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
+-- >>> fromVersion [0, 1, 2]
+-- 0.1.2
+-- >>> _pkgEpoch $ fromVersion [0, 1, 2]
 -- 0
--- >>> _rpmVersion . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
+-- >>> _pkgVersion $ fromVersion [0, 1, 2]
 -- "0.1.2"
--- >>> _rpmRelease . fromVersion $ Version [0, 1, 2] ["alpha0", "i386"]
--- "alpha0-i386"
-fromVersion :: Version -> RpmVersion
-fromVersion Version{versionBranch = b, versionTags = t} = def
-    { _rpmVersion = Strict.Text.pack $ showVersion Version
-        { versionBranch = b
+-- >>> _pkgRelease $ fromVersion [0, 1, 2]
+-- ""
+fromVersion :: [Int] -> PkgVersion
+fromVersion v = def
+    { _pkgVersion = Strict.Text.pack $ showVersion Version
+        { versionBranch = v
         , versionTags   = []
-        }
-    , _rpmRelease = Strict.Text.pack . List.drop 1 $ showVersion Version
-        { versionBranch = []
-        , versionTags   = t
         }
     }

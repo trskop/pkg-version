@@ -1,11 +1,12 @@
-Rpm-version
+Pkg-version
 ===========
 
 
 Description
 -----------
 
-Data type for version strings used by RPM package manager for packages.
+Data types for version strings used by RPM and DPKG package manager for
+packages.
 
 Naming convention used by RPM package is sometimes refered to as NEVRA which
 looks like:
@@ -18,6 +19,3 @@ Portion that contains only version information is sometimes called EVR:
 
 This library provides `RpmVersion` data type for EVR and correct `Eq` and `Ord`
 instances.
-
-
-Data type for versions used by RPM packages.

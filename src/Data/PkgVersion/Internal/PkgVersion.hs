@@ -3,7 +3,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:       $HEADER$
--- Description:  Data type for RPM version
+-- Description:  Data type for RPM and DPKG package version
 -- Copyright:    (c) 2014 Peter Trsko
 -- License:      BSD3
 --
@@ -11,16 +11,16 @@
 -- Stability:    experimental
 -- Portability:  DeriveDataTypeable, DeriveGeneric, NoImplicitPrelude
 --
--- Data type for RPM version.
-module Data.RpmVersion.Internal.RpmVersion
+-- Data type for RPM and DPKG package version.
+module Data.PkgVersion.Internal.PkgVersion
     (
-    -- * RpmVersion
-      RpmVersion(..)
+    -- * PkgVersion
+      PkgVersion(..)
 
     -- * Lenses
-    , rpmEpoch
-    , rpmVersion
-    , rpmRelease
+    , pkgEpoch
+    , pkgVersion
+    , pkgRelease
 
     -- * Serialization
     , toStrictText
@@ -28,6 +28,7 @@ module Data.RpmVersion.Internal.RpmVersion
 
     -- * Utility functions
     , compareRpmVersion
+--  , compareDpkgVersion
     )
   where
 
@@ -49,22 +50,22 @@ import Data.Text as Strict.Text (empty, null, pack, singleton, unpack)
 
 import Data.Default.Class (Default(def))
 
-import Data.RpmVersion.Internal.RpmVerCmp (rpmVerCmp)
+import Data.PkgVersion.Internal.RpmVerCmp (rpmVerCmp)
 
 
 -- | Rerpresents EVR (@epoch:version-release@) portion of NEVRA
 -- (@name-epoch:version-release.architecture@) naming convention used by RPM
 -- package manager.
-data RpmVersion = RpmVersion
-    { _rpmEpoch   :: !Word32
-    , _rpmVersion :: !Strict.Text
-    , _rpmRelease :: !Strict.Text
+data PkgVersion = PkgVersion
+    { _pkgEpoch   :: !Word32
+    , _pkgVersion :: !Strict.Text
+    , _pkgRelease :: !Strict.Text
     }
   deriving (Data, Generic, Typeable)
 
--- | Serialize 'RpmVersion' to strict 'Strict.Text'.
-toStrictText :: RpmVersion -> Strict.Text
-toStrictText (RpmVersion e version r) = epoch <> version <> release
+-- | Serialize 'PkgVersion' to strict 'Strict.Text'.
+toStrictText :: PkgVersion -> Strict.Text
+toStrictText (PkgVersion e version r) = epoch <> version <> release
   where
     colon = Strict.Text.singleton ':'
     dash  = Strict.Text.singleton '-'
@@ -77,17 +78,17 @@ toStrictText (RpmVersion e version r) = epoch <> version <> release
       | Strict.Text.null r = Strict.Text.empty
       | otherwise          = dash <> r
 
--- | Serialize 'RpmVersion' in to 'String'. Internally it uses 'toStrictText'.
-toString :: RpmVersion -> String
+-- | Serialize 'PkgVersion' in to 'String'. Internally it uses 'toStrictText'.
+toString :: PkgVersion -> String
 toString = Strict.Text.unpack . toStrictText
 
-instance Show RpmVersion where
+instance Show PkgVersion where
     showsPrec _ = showString . toString
 
--- | Compare two 'RpmVersion' values using standard 'compare' for 'rpmEpoch',
--- and 'rpmVerCmp' for 'rpmVersion' and 'rpmRelease'.
-compareRpmVersion :: RpmVersion -> RpmVersion -> Ordering
-compareRpmVersion (RpmVersion e1 v1 r1) (RpmVersion e2 v2 r2)
+-- | Compare two 'PkgVersion' values using standard 'compare' for 'pkgEpoch',
+-- and 'pkgVerCmp' for 'pkgVersion' and 'pkgRelease'.
+compareRpmVersion :: PkgVersion -> PkgVersion -> Ordering
+compareRpmVersion (PkgVersion e1 v1 r1) (PkgVersion e2 v2 r2)
   | epochCmp   /= EQ = epochCmp
   | versionCmp /= EQ = versionCmp
   | otherwise        = releaseCmp
@@ -96,30 +97,32 @@ compareRpmVersion (RpmVersion e1 v1 r1) (RpmVersion e2 v2 r2)
     versionCmp = v1 `rpmVerCmp` v2
     releaseCmp = r1 `rpmVerCmp` r2
 
--- | @
--- r1 '==' r2 = 'compareRpmVersion' r1 r2 '==' 'EQ'
--- @
-instance Eq RpmVersion where
-    r1 == r2 = compareRpmVersion r1 r2 == EQ
+{-
+-- | Compare two 'PkgVersion' values using standard 'compare' for 'pkgEpoch',
+-- and 'dpkgVerCmp' for 'pkgVersion' and 'pkgRelease'.
+compareDpkgVersion :: PkgVersion -> PkgVersion -> Ordering
+compareDpkgVersion (PkgVersion e1 v1 r1) (PkgVersion e2 v2 r2)
+  | epochCmp   /= EQ = epochCmp
+  | versionCmp /= EQ = versionCmp
+  | otherwise        = releaseCmp
+  where
+    epochCmp   = e1 `compare`   e2
+    versionCmp = v1 `dpkgVerCmp` v2
+    releaseCmp = r1 `dpkgVerCmp` r2
+-}
 
 -- | @
--- 'compare' = 'compareRpmVersion'
--- @
-instance Ord RpmVersion where
-    compare = compareRpmVersion
-
--- | @
--- 'def' = 'RpmVersion'
---     { '_rpmEpoch'   = 0
---     , '_rpmVersion' = \"\"
---     , '_rpmRelease' = \"\"
+-- 'def' = 'PkgVersion'
+--     { '_pkgEpoch'   = 0
+--     , '_pkgVersion' = \"\"
+--     , '_pkgRelease' = \"\"
 --     }
 -- @
-instance Default RpmVersion where
-    def = RpmVersion
-        { _rpmEpoch   = 0
-        , _rpmVersion = Strict.Text.empty
-        , _rpmRelease = Strict.Text.empty
+instance Default PkgVersion where
+    def = PkgVersion
+        { _pkgEpoch   = 0
+        , _pkgVersion = Strict.Text.empty
+        , _pkgRelease = Strict.Text.empty
         }
 
 -- {{{ Lenses -----------------------------------------------------------------
@@ -131,8 +134,8 @@ instance Default RpmVersion where
 
 -- | Epoch number within @[0, 'Prelude.maxBound' :: 'Word32']@ interval and
 -- defaults to 0 if not present. It is used to determine which version is
--- greater when 'rpmVerCmp' algorithm would otherwise fail to do it correctly.
--- In example @2.01@ and @2.1@ are considered equal by 'rpmVerCmp', but may be
+-- greater when 'pkgVerCmp' algorithm would otherwise fail to do it correctly.
+-- In example @2.01@ and @2.1@ are considered equal by 'pkgVerCmp', but may be
 -- entirely different for a certain versioning scheme.
 --
 -- Here is a perfect summary:
@@ -156,33 +159,33 @@ instance Default RpmVersion where
 --
 -- Source:
 -- <https://ask.fedoraproject.org/en/question/6987/whats-the-meaning-of-the-number-which-appears-sometimes-when-i-use-yum-to-install-a-fedora-package-before-a-colon-at-the-beginning-of-the-name-of-the/?answer=12058#post-id-12058>
-rpmEpoch
+pkgEpoch
     :: Functor f
     => (Word32 -> f Word32)
-    -> RpmVersion -> f RpmVersion
-rpmEpoch f s@(RpmVersion{_rpmEpoch = a}) =
-    f a <$$> \b -> s{_rpmEpoch = b}
+    -> PkgVersion -> f PkgVersion
+pkgEpoch f s@(PkgVersion{_pkgEpoch = a}) =
+    f a <$$> \b -> s{_pkgEpoch = b}
 
 -- | Version number consisting of alpha-numeric characters separated by
 -- non-alpha-numeric characters, it can not contain @\'-\'@, because that is
 -- used as a delimiter between version number and release in NEVRA
 -- (@name-epoch:version-release.architecture@) naming convention..
-rpmVersion
+pkgVersion
     :: Functor f
     => (Strict.Text -> f Strict.Text)
-    -> RpmVersion -> f RpmVersion
-rpmVersion f s@(RpmVersion{_rpmVersion = a}) =
-    f a <$$> \b -> s{_rpmVersion = b}
+    -> PkgVersion -> f PkgVersion
+pkgVersion f s@(PkgVersion{_pkgVersion = a}) =
+    f a <$$> \b -> s{_pkgVersion = b}
 
--- | Release number, similar restrictins as for 'rpmVersion' apply. Difference
+-- | Release number, similar restrictins as for 'pkgVersion' apply. Difference
 -- is that it may contain @\'-\'@ character, but not @\'.\'@, since that is
 -- used to delimit architecture portion of NEVRA
 -- (@name-epoch:version-release.architecture@) naming convention.
-rpmRelease
+pkgRelease
     :: Functor f
     => (Strict.Text -> f Strict.Text)
-    -> RpmVersion -> f RpmVersion
-rpmRelease f s@(RpmVersion{_rpmRelease = a}) =
-    f a <$$> \b -> s{_rpmRelease = b}
+    -> PkgVersion -> f PkgVersion
+pkgRelease f s@(PkgVersion{_pkgRelease = a}) =
+    f a <$$> \b -> s{_pkgRelease = b}
 
 -- }}} Lenses -----------------------------------------------------------------

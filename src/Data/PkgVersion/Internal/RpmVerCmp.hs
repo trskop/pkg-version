@@ -10,7 +10,7 @@
 -- Portability:  NoImplicitPrelude
 --
 -- Version comparision based on RPM package manager.
-module Data.RpmVersion.Internal.RpmVerCmp
+module Data.PkgVersion.Internal.RpmVerCmp
     (
     -- * RPM Version Comparison
       rpmVerCmp
