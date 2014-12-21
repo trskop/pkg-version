@@ -40,7 +40,12 @@ import Data.Text as Strict.Text (empty, null, pack, singleton)
 
 import Data.Default.Class (Default(def))
 
-import Data.PkgVersion.Class (IsPkgVersion(..))
+import Data.PkgVersion.Class
+    ( HasEpoch(epoch)
+    , HasVersion(version)
+    , HasRelease(release)
+    , Serializable(toStrictText, toString)
+    )
 import Data.PkgVersion.Internal.RpmVerCmp (rpmVerCmp)
 
 
@@ -101,16 +106,19 @@ instance Default PkgVersion where
 (<$$>) = flip fmap
 {-# INLINE (<$$>) #-}
 
-instance IsPkgVersion PkgVersion where
+instance HasEpoch PkgVersion where
     epoch f s@(PkgVersion{_pkgEpoch = a}) =
         f a <$$> \b -> s{_pkgEpoch = b}
 
+instance HasVersion PkgVersion where
     version f s@(PkgVersion{_pkgVersion = a}) =
         f a <$$> \b -> s{_pkgVersion = b}
 
+instance HasRelease PkgVersion where
     release f s@(PkgVersion{_pkgRelease = a}) =
         f a <$$> \b -> s{_pkgRelease = b}
 
+instance Serializable PkgVersion where
     toStrictText (PkgVersion e v r) = e' <> v <> r'
       where
         colon = Strict.Text.singleton ':'

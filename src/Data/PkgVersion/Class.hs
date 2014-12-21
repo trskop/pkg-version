@@ -26,7 +26,7 @@ import qualified Data.Text as Text (unpack)
 import Data.Default.Class (Default)
 
 
-class (Default a) => IsPkgVersion a where
+class Default a => HasEpoch a where
     -- | Epoch number within @[0, 'Prelude.maxBound' :: 'Word32']@ interval and
     -- defaults to 0 if not present. It is used to determine which version is
     -- greater when 'pkgVerCmp' algorithm would otherwise fail to do it
@@ -60,6 +60,7 @@ class (Default a) => IsPkgVersion a where
         => (Word32 -> f Word32)
         -> a -> f a
 
+class Default a => HasVersion a where
     -- | Version number consisting of alpha-numeric characters separated by
     -- non-alpha-numeric characters, it can not contain @\'-\'@, because that
     -- is used as a delimiter between version number and release in NEVRA
@@ -69,6 +70,7 @@ class (Default a) => IsPkgVersion a where
         => (Text -> f Text)
         -> a -> f a
 
+class Default a => HasRelease a where
     -- | Release number, similar restrictins as for 'pkgVersion' apply.
     -- Difference is that it may contain @\'-\'@ character, but not @\'.\'@,
     -- since that is used to delimit architecture portion of NEVRA
@@ -78,6 +80,7 @@ class (Default a) => IsPkgVersion a where
         => (Text -> f Text)
         -> a -> f a
 
+class Default a => Serializable a where
     -- | Serialize package version to strict 'Text'.
     toStrictText :: a -> Text
 

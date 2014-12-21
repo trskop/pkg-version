@@ -37,7 +37,12 @@ import Text.Show (Show(showsPrec))
 
 import Data.Default.Class (Default(def))
 
-import Data.PkgVersion.Class (IsPkgVersion(..))
+import Data.PkgVersion.Class
+    ( HasEpoch(epoch)
+    , HasVersion(version)
+    , HasRelease(release)
+    , Serializable(toStrictText, toString)
+    )
 import Data.PkgVersion.Internal.PkgVersion (PkgVersion(PkgVersion))
 import Data.PkgVersion.Internal.RpmVerCmp (rpmVerCmp)
 
@@ -82,10 +87,16 @@ instance Ord RpmVersion where
 instance Default RpmVersion where
     def = RpmVersion def
 
-instance IsPkgVersion RpmVersion where
+instance HasEpoch RpmVersion where
     epoch = rpmVersion . epoch
+
+instance HasVersion RpmVersion where
     version = rpmVersion . version
+
+instance HasRelease RpmVersion where
     release = rpmVersion . release
+
+instance Serializable RpmVersion where
     toStrictText (RpmVersion pkgVersion) = toStrictText pkgVersion
     toString (RpmVersion pkgVersion) = toString pkgVersion
 
