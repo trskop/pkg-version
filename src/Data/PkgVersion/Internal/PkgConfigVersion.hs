@@ -22,7 +22,7 @@ module Data.PkgVersion.Internal.PkgConfigVersion
 import Data.Data (Data)
 import Data.Eq (Eq((==)))
 import Data.Function ((.))
-import Data.Functor (Functor, (<$>))
+import Data.Functor ((<$>))
 import Data.Ord (Ord(compare), Ordering(EQ))
 import Data.Typeable (Typeable)
 import GHC.Generics (Generic)
