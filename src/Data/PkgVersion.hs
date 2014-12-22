@@ -12,8 +12,10 @@
 -- Data type for versions as understood by RPM package manager.
 module Data.PkgVersion
     (
-    -- * RpmVersion Data Type
-      RpmVersion
+    -- * Package Version Data Types
+      DpkgVersion
+    , PkgConfigVersion
+    , RpmVersion
 
     -- * Smart Constructors
     , fromVersion
@@ -31,6 +33,8 @@ import qualified Data.Text as Strict.Text (pack)
 import Data.Default.Class (Default(def))
 
 import Data.PkgVersion.Class
+import Data.PkgVersion.Internal.DpkgVersion (DpkgVersion)
+import Data.PkgVersion.Internal.PkgConfigVersion (PkgConfigVersion)
 import Data.PkgVersion.Internal.PkgVersion (PkgVersion(_pkgVersion))
 import Data.PkgVersion.Internal.RpmVersion (RpmVersion)
 
@@ -45,6 +49,7 @@ import Data.PkgVersion.Internal.RpmVersion (RpmVersion)
 -- "0.1.2"
 -- >>> _pkgRelease $ fromVersion [0, 1, 2]
 -- ""
+--fromVersion :: HasVersion a => [Int] -> a
 fromVersion :: [Int] -> PkgVersion
 fromVersion v = def
     { _pkgVersion = Strict.Text.pack $ showVersion Version

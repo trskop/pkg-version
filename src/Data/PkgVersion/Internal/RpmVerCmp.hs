@@ -17,8 +17,8 @@ module Data.PkgVersion.Internal.RpmVerCmp
     , rpmBreak
 
     -- * Pkg-config Version Comparison
-    , pkgVerCmp
-    , pkgBreak
+    , pkgConfigVerCmp
+    , pkgConfigBreak
 
     -- * Utility Functions
     , compareVersionsWith
@@ -86,15 +86,15 @@ rpmBreak s
 
 -- | Version comparision as understood by /pkg-config/ tool.
 --
--- Difference between 'rpmVerCmp' and 'pkgVerCmp' is that 'pkgVerCmp' doesn't
--- understand magic @~@ character.
-pkgVerCmp :: Strict.Text -> Strict.Text -> Ordering
-pkgVerCmp = compareVersionsWith pkgBreak
+-- Difference between 'rpmVerCmp' and 'pkgConfigVerCmp' is that
+-- 'pkgConfigVerCmp' doesn't understand magic @~@ character.
+pkgConfigVerCmp :: Strict.Text -> Strict.Text -> Ordering
+pkgConfigVerCmp = compareVersionsWith pkgConfigBreak
 
 -- | Break string in to a version component and the resto of a string. It does
 -- it in a way how /pkg-config/ understands versions.
-pkgBreak :: Strict.Text -> (Strict.Text, Strict.Text)
-pkgBreak s
+pkgConfigBreak :: Strict.Text -> (Strict.Text, Strict.Text)
+pkgConfigBreak s
   | Strict.Text.null s = (s, s)                         -- = ("", "")
   | otherwise          = case Strict.Text.uncons s' of
     Nothing     -> (s', s')                             -- = ("", "")
