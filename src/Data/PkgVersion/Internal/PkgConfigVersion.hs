@@ -16,6 +16,9 @@ module Data.PkgVersion.Internal.PkgConfigVersion
     (
     -- * PkgConfigVersion
       PkgConfigVersion(..)
+
+    -- * Utility functions
+    , comparePkgConfigVersion
     )
   where
 
@@ -42,6 +45,13 @@ import Data.PkgVersion.Internal.RpmVerCmp (pkgConfigVerCmp)
 
 newtype PkgConfigVersion = PkgConfigVersion Strict.Text
   deriving (Data, Generic, Typeable)
+
+-- | Compare two raw (unwrapped) 'PkgConfigVersion' values using variation of
+-- 'Data.PkgVersion.Internal.RpmVerCmp.rpmVerCmp', namely 'pkgConfigVerCmp',
+-- that doesn't treat @\'~\'@ character specially.
+comparePkgConfigVersion :: Strict.Text -> Strict.Text -> Ordering
+comparePkgConfigVersion = pkgConfigVerCmp
+{-# INLINE comparePkgConfigVersion #-}
 
 -- {{{ Instances for PkgConfigVersion -----------------------------------------
 
