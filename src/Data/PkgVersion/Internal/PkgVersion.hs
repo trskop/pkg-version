@@ -16,20 +16,15 @@ module Data.PkgVersion.Internal.PkgVersion
     (
     -- * PkgVersion
       PkgVersion(..)
-
-    -- * Utility functions
-    , compareRpmVersion
---  , compareDpkgVersion
     )
   where
 
 import Data.Bool (otherwise)
 import Data.Data (Data)
-import Data.Eq (Eq((==), (/=)))
+import Data.Eq (Eq((==)))
 import Data.Function ((.), flip)
 import Data.Functor (Functor(fmap))
 import Data.Monoid ((<>))
-import Data.Ord (Ord(compare), Ordering(EQ))
 import Data.Typeable (Typeable)
 import Data.Word (Word32)
 import GHC.Generics (Generic)
@@ -46,7 +41,6 @@ import Data.PkgVersion.Class
     , HasRelease(release)
     , Serializable(toStrictText, toString)
     )
-import Data.PkgVersion.Internal.RpmVerCmp (rpmVerCmp)
 
 
 -- | Rerpresents EVR (@epoch:version-release@) portion of NEVRA
@@ -58,32 +52,6 @@ data PkgVersion = PkgVersion
     , _pkgRelease :: !Strict.Text
     }
   deriving (Data, Generic, Typeable)
-
--- | Compare two 'PkgVersion' values using standard 'compare' for 'pkgEpoch',
--- and 'pkgVerCmp' for 'pkgVersion' and 'pkgRelease'.
-compareRpmVersion :: PkgVersion -> PkgVersion -> Ordering
-compareRpmVersion (PkgVersion e1 v1 r1) (PkgVersion e2 v2 r2)
-  | epochCmp   /= EQ = epochCmp
-  | versionCmp /= EQ = versionCmp
-  | otherwise        = releaseCmp
-  where
-    epochCmp   = e1 `compare`   e2
-    versionCmp = v1 `rpmVerCmp` v2
-    releaseCmp = r1 `rpmVerCmp` r2
-
-{-
--- | Compare two 'PkgVersion' values using standard 'compare' for 'pkgEpoch',
--- and 'dpkgVerCmp' for 'pkgVersion' and 'pkgRelease'.
-compareDpkgVersion :: PkgVersion -> PkgVersion -> Ordering
-compareDpkgVersion (PkgVersion e1 v1 r1) (PkgVersion e2 v2 r2)
-  | epochCmp   /= EQ = epochCmp
-  | versionCmp /= EQ = versionCmp
-  | otherwise        = releaseCmp
-  where
-    epochCmp   = e1 `compare`   e2
-    versionCmp = v1 `dpkgVerCmp` v2
-    releaseCmp = r1 `dpkgVerCmp` r2
--}
 
 -- {{{ Instances for PkgVersion -----------------------------------------------
 
