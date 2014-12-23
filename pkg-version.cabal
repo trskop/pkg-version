@@ -19,6 +19,11 @@ extra-source-files:
     ChangeLog.md
   , README.md
 
+flag pedantic
+  description:
+    Pass additional warning flags including -Werror to GHC during compilation.
+  default: False
+
 library
   hs-source-dirs:       src
   default-language:     Haskell2010
@@ -38,11 +43,17 @@ library
     , NoImplicitPrelude
 
   build-depends:
+    -- {{{ Distributed w/ GHC or Haskell Platform
       base >=4.7 && <4.8
     , text >=1.1 && <1.3
+    -- }}} Distributed w/ GHC or Haskell Platform
     , data-default-class ==0.0.*
 
   ghc-options:          -Wall
+  if impl(ghc >= 6.8)
+    ghc-options:        -fwarn-tabs
+  if flag(pedantic)
+    ghc-options:        -Werror
 
 source-repository head
   type:                 git
