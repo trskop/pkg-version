@@ -26,13 +26,15 @@ import qualified Data.Text as Text (unpack)
 import Data.Default.Class (Default)
 
 
+-- | If package version has an epoch field, then instance of this class allows
+-- access to it.
 class Default a => HasEpoch a where
     -- | Epoch number within @[0, 'Prelude.maxBound' :: 'Word32']@ interval and
     -- defaults to 0 if not present. It is used to determine which version is
-    -- greater when 'pkgVerCmp' algorithm would otherwise fail to do it
-    -- correctly. In example @2.01@ and @2.1@ are considered equal by
-    -- 'pkgVerCmp', but may be entirely different for a certain versioning
-    -- scheme.
+    -- greater when standard algorithm would otherwise fail to do it correctly.
+    -- In example @2.01@ and @2.1@ are considered equal by
+    -- 'Data.PkgVersion.Internal.RpmVerCmp.rpmVerCmp', but may be entirely
+    -- different for a certain versioning scheme.
     --
     -- Here is a perfect summary:
     --
@@ -60,6 +62,8 @@ class Default a => HasEpoch a where
         => (Word32 -> f Word32)
         -> a -> f a
 
+-- | Probably all package version data types will have instance for this type
+-- class since it allows access to version value in form of strict 'Text'.
 class Default a => HasVersion a where
     -- | Version number consisting of alpha-numeric characters separated by
     -- non-alpha-numeric characters, it can not contain @\'-\'@, because that
@@ -70,6 +74,8 @@ class Default a => HasVersion a where
         => (Text -> f Text)
         -> a -> f a
 
+-- | If package version has a release field, then instance of this class allows
+-- access to it.
 class Default a => HasRelease a where
     -- | Release number, similar restrictins as for 'pkgVersion' apply.
     -- Difference is that it may contain @\'-\'@ character, but not @\'.\'@,
@@ -80,6 +86,7 @@ class Default a => HasRelease a where
         => (Text -> f Text)
         -> a -> f a
 
+-- | Serialize package version in to strict 'Text' and 'String'.
 class Default a => Serializable a where
     -- | Serialize package version to strict 'Text'.
     toStrictText :: a -> Text
