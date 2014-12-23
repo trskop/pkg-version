@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 -- |
 -- Module:       $HEADER$
--- Description:  TODO
+-- Description:  Type classes for package version types
 -- Copyright:    (c) 2014 Peter Trsko
 -- License:      BSD3
 --
@@ -9,10 +9,14 @@
 -- Stability:    experimental
 -- Portability:  NoImplicitPrelude
 --
--- TODO
+-- Type classes for package version types.
 module Data.PkgVersion.Class
---  (
---  )
+    (
+      HasEpoch(..)
+    , HasVersion(..)
+    , HasRelease(..)
+    , Serialize(..)
+    )
   where
 
 import Data.Function ((.))
