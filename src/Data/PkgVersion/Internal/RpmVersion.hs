@@ -60,7 +60,7 @@ rpmVersion
 rpmVersion f (RpmVersion a) = RpmVersion <$> f a
 
 -- | Compare two unwrapped 'RpmVersion' values using standard 'compare' for
--- 'rpmEpoch', and 'rpmVerCmp' for 'rpmVersion' and 'rpmRelease'.
+-- 'epoch', and 'rpmVerCmp' for 'version' and 'release'.
 compareRpmVersion :: PkgVersion -> PkgVersion -> Ordering
 compareRpmVersion (PkgVersion e1 v1 r1) (PkgVersion e2 v2 r2)
   | epochCmp   /= EQ = epochCmp
@@ -73,17 +73,15 @@ compareRpmVersion (PkgVersion e1 v1 r1) (PkgVersion e2 v2 r2)
 
 -- {{{ Instances for RpmVersion -----------------------------------------------
 
--- | @
--- 'RpmVersion' r1 '==' 'RpmVersion' r2 = 'compareRpmVersion' r1 r2 '==' 'EQ'
--- @
+-- | Implemented using 'compareRpmVersion'.
 instance Eq RpmVersion where
     RpmVersion r1 == RpmVersion r2 = compareRpmVersion r1 r2 == EQ
 
--- | @RpmVersion r1 `compare` RpmVersion r2 = r1 `compareRpmVersion` r2@
+-- | Implemented using 'compareRpmVersion'.
 instance Ord RpmVersion where
     RpmVersion r1 `compare` RpmVersion r2 = r1 `compareRpmVersion` r2
 
--- | @'def' = 'RpmVersion' 'def'@
+-- | Implemented using 'Default' instance for 'PkgVersion'.
 instance Default RpmVersion where
     def = RpmVersion def
 

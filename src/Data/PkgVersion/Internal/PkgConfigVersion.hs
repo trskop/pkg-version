@@ -55,19 +55,17 @@ comparePkgConfigVersion = pkgConfigVerCmp
 
 -- {{{ Instances for PkgConfigVersion -----------------------------------------
 
--- | @'PkgConfigVersion' r1 '==' 'PkgConfigVersion' r2 =
--- 'pkgConfigVerCmp' r1 r2 '==' 'EQ'@
+-- | Implemented using 'comparePkgConfigVersion'.
 instance Eq PkgConfigVersion where
     PkgConfigVersion r1 == PkgConfigVersion r2 =
         pkgConfigVerCmp r1 r2 == EQ
 
--- | @PkgConfigVersion r1 `compare` PkgConfigVersion r2 =
--- r1 `pkgConfigVerCmp` r2@
+-- | Implemented using 'comparePkgConfigVersion'.
 instance Ord PkgConfigVersion where
     PkgConfigVersion r1 `compare` PkgConfigVersion r2 =
         r1 `pkgConfigVerCmp` r2
 
--- | @'def' = 'PkgConfigVersion' 'Strict.Text.empty'@
+-- | Default value is empty version: @'def' = 'PkgConfigVersion' \"\"@.
 instance Default PkgConfigVersion where
     def = PkgConfigVersion Strict.Text.empty
 

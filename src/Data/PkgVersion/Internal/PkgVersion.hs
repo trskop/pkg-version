@@ -43,9 +43,16 @@ import Data.PkgVersion.Class
     )
 
 
--- | Rerpresents EVR (@epoch:version-release@) portion of NEVRA
--- (@name-epoch:version-release.architecture@) naming convention used by RPM
--- package manager.
+-- | Generic package version that works for both RPM and DPKG, but 'Data.Eq.Eq'
+-- and 'Data.Ord.Ord' instances have to be defined separately for each.
+--
+-- It rerpresents version in format:
+--
+-- > [epoch:]version[-release]
+--
+-- Both RPM and DPKG use similar versioning scheme, therefore this data type is
+-- used as basis for both 'Data.PkgVersion.Internal.RpmVersion.RpmVersion' and
+-- 'Data.PkgVersion.Internal.DpkgVersion.DpkgVersion'.
 data PkgVersion = PkgVersion
     { _pkgEpoch   :: !Word32
     , _pkgVersion :: !Strict.Text
@@ -55,7 +62,10 @@ data PkgVersion = PkgVersion
 
 -- {{{ Instances for PkgVersion -----------------------------------------------
 
--- | @
+-- | Instance reflects the shared idea that if epoch is not present then it is
+-- considered to be zero and that release may be empty:
+--
+-- @
 -- 'def' = 'PkgVersion'
 --     { '_pkgEpoch'   = 0
 --     , '_pkgVersion' = \"\"
