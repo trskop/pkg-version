@@ -5,7 +5,7 @@ description:
   Data types for version strings used by RPM and DPKG package manager for
   packages.
 
-homepage:             https://github.com/trskop/rpm-version
+homepage:             https://github.com/trskop/pkg-version
 license:              BSD3
 license-file:         LICENSE
 author:               Peter Trško
@@ -43,3 +43,7 @@ library
     , data-default-class ==0.0.*
 
   ghc-options:          -Wall
+
+source-repository head
+  type:                 git
+  location:             git://github.com/trskop/pkg-version.git
