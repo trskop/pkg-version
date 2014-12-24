@@ -15,7 +15,7 @@ module Data.PkgVersion.Class
       HasEpoch(..)
     , HasVersion(..)
     , HasRelease(..)
-    , Serialize(..)
+    , Serializable(..)
     )
   where
 
