@@ -53,6 +53,7 @@ import Data.PkgVersion.Internal.RpmVerCmp (rpmVerCmp)
 newtype RpmVersion = RpmVersion PkgVersion
   deriving (Data, Generic, Typeable)
 
+-- | Lens for accessing 'PkgVersion' wrapped inside 'RpmVersion'.
 rpmVersion
     :: Functor f
     => (PkgVersion -> f PkgVersion)
