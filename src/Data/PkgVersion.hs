@@ -17,43 +17,12 @@ module Data.PkgVersion
     , PkgConfigVersion
     , RpmVersion
 
-    -- * Smart Constructors
-    , fromVersion
-
+    -- * Abstract interface
     , module Data.PkgVersion.Class
     )
   where
 
-import Data.Function (($))
-import Data.Int (Int)
-import Data.Version (Version(..), showVersion)
-
-import qualified Data.Text as Strict.Text (pack)
-
-import Data.Default.Class (Default(def))
-
 import Data.PkgVersion.Class
 import Data.PkgVersion.Internal.DpkgVersion (DpkgVersion)
 import Data.PkgVersion.Internal.PkgConfigVersion (PkgConfigVersion)
-import Data.PkgVersion.Internal.PkgVersion (PkgVersion(_pkgVersion))
 import Data.PkgVersion.Internal.RpmVersion (RpmVersion)
-
-
--- | Convert simple version number in o PkgVersion.
---
--- >>> fromVersion [0, 1, 2]
--- 0.1.2
--- >>> _pkgEpoch $ fromVersion [0, 1, 2]
--- 0
--- >>> _pkgVersion $ fromVersion [0, 1, 2]
--- "0.1.2"
--- >>> _pkgRelease $ fromVersion [0, 1, 2]
--- ""
---fromVersion :: HasVersion a => [Int] -> a
-fromVersion :: [Int] -> PkgVersion
-fromVersion v = def
-    { _pkgVersion = Strict.Text.pack $ showVersion Version
-        { versionBranch = v
-        , versionTags   = []
-        }
-    }
