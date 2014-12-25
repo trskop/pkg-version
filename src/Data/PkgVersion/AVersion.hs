@@ -486,3 +486,19 @@ splittedVersionToAString (v : vs) = fromString (show v) <> case vs of
 -- 3.14.159
 -- >>> debianPackageVersion (3, 14, Just (159, Just 2653))
 -- 3.14.159.2653
+--
+-- Version defined by Cabal can be also reused. For this purpose there is an
+-- @instance VersionArguments Version@ and it can be used to take Haskell
+-- package version and transform it in to a different representation. Example:
+--
+-- @
+-- import qualified Paths_my_package as My (version)
+--
+-- debianPackageVersion :: 'DpkgVersion'
+-- debianPackageVersion = 'aVersion' My.version
+-- @
+--
+-- Here is a detail of how it works:
+--
+-- >>> aVersion (Version [3,14,159,2653] []) :: DpkgVersion
+-- 3.14.159.2653
