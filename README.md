@@ -1,6 +1,8 @@
 Pkg-version
 ===========
 
+[![Build](https://travis-ci.org/trskop/pkg-version.svg)](https://travis-ci.org/trskop/pkg-version)
+
 
 Description
 -----------
