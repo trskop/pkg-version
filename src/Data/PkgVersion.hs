@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# OPTIONS_GHC -fno-warn-missing-import-lists #-}
 -- |
 -- Module:       $HEADER$
 -- Description:  Data type for versions as understood by RPM package manager

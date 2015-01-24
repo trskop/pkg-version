@@ -59,7 +59,7 @@ import Foreign.C.Types
 import Text.Show (Show(show))
 import System.IO (IO)
 
-import Control.Monad.Trans.Identity (IdentityT(..))
+import Control.Monad.Trans.Identity (IdentityT(IdentityT))
 import qualified Data.Text as Strict (Text)
 import qualified Data.Text.Lazy as Lazy (Text)
 
