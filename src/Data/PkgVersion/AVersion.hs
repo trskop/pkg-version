@@ -2,7 +2,7 @@
 -- |
 -- Module:       $HEADER$
 -- Description:  Printf for versions
--- Copyright:    (c) 2014 Peter Trsko
+-- Copyright:    (c) 2014-2015, Peter Trsko
 -- License:      BSD3
 --
 -- Maintainer:   peter.trsko@gmail.com

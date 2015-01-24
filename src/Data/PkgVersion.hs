@@ -3,7 +3,7 @@
 -- |
 -- Module:       $HEADER$
 -- Description:  Data type for versions as understood by RPM package manager
--- Copyright:    (c) 2014 Peter Trsko
+-- Copyright:    (c) 2014-2015, Peter Trsko
 -- License:      BSD3
 --
 -- Maintainer:   peter.trsko@gmail.com
